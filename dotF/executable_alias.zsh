@@ -5,6 +5,7 @@
 alias '$'='' # 省去删掉复制来的命令 最前面的$
 # oh my git    oh my god
 alias omg='chezmoi'
+alias x='git'
 
 # 在~/dotF/bin_wf 下
 alias names='massren'
@@ -75,6 +76,7 @@ ht(){
 
 
 alias cle='clear -x'
+
 q(){
     tree -L 2 --filelimit=50 $1 | peco
 }
@@ -129,7 +131,7 @@ unzip_multi(){
     do
         #${varible:n1:n2}:截取变量varible从n1到n2之间的字符串。 类似python
         dir=${x:0:-4}
-        \mkdir ${dir}
+        \mkdir --parent --verbose ${dir}
         unzip ${x} -d ${dir} && t ${x}
     done
 }
@@ -151,6 +153,7 @@ alias nls='export chpwd_functions=()'
 # %y :  time of last data `modification`
 # tac  倒着列出  # cat倒过来
 # %y表示  `modify time`
+
 mt(){
     # todo: 送到peco
     echo '如果在目录下新增内容，该目录的mtime会变。如果只是修改其下内容，该目录的mtime不变'
@@ -224,6 +227,30 @@ mt(){
 #
 # echo "$(stat -c '%n %A' $filename) $(date -d "1970-01-01 + $(stat -c '%Z' $filename ) secs"  '+%F %X')"
 # %Y     time of last data modification, seconds since Epoch
+
+# newer time
+nt(){
+    # to create a file dated 4 p.m., March 20, give the command:
+    # 第一个参数
+    touch -t ${1}00 ~/.t/time1  # time ([[CC]YY]MMDDhhmm[.SS])
+    # 第2个参数
+    touch -t ${2}00 ~/.t/time2
+    find .  -type f                    \
+            -newer ~/.t/time1          \
+            \( \! -newer ~/.t/time2 \) \
+            -exec exa {}             \
+                    --classify       \
+                    --colour=always  \
+                    --no-user        \
+                    --no-permissions \
+                    --sort=time      \
+                    --time-style=iso \
+                    --long    \;     \
+                    | less
+    # The line-continuation will fail if you have whitespace (spaces or tab characters¹) after the backslash and before the newline.
+    # Using Windows line endings \r\n (CRLF) line endings will break the command line break.
+}
+
 # <_<---------------------------------------------------------关于mtime-----------------------------------<_<
 
 #移到垃圾箱
@@ -389,23 +416,23 @@ alias ll='\ls -1htr --color=always --classify | head -30'
 #     echo "列了所有：${tmp}"
 # }
 lf(){
-    $HOME/dotF/exa/bin/exa \
-    --long \
-    --classify \
-    --colour=always \
-    --header  \
-    --no-user  \
-    --no-permissions  \
-    --sort=time  \
-    --time-style=iso $1 | less
-    # --group-directories-first    # 不好，
+    exa                  \
+        --long           \
+        --classify       \
+        --colour=always  \
+        --header         \
+        --no-user        \
+        --no-permissions \
+        --sort=time      \
+        --time-style=iso $1 | le
+        # --group-directories-first    # 不好，
 
     tmp=$((`\ls -l | wc -l`-1))
     echo "共：${tmp}"
 }
 
 l(){
-    $HOME/dotF/exa/bin/exa \
+    exa \
     --long \
     --classify \
     --colour=always \
@@ -457,7 +484,7 @@ ls_after_cd() {
     # -R  | reset all options instead of only those needed for script portability
     #  模拟 csh ksh sh 或者 （没加配置的）zsh
 
-    $HOME/dotF/exa/bin/exa \
+    exa \
         --long \
         --classify \
         --colour=always \
@@ -597,12 +624,10 @@ md(){
             # mkdir 不会覆盖已有目录
             # 只是想echo一下，提醒自己 尽量回忆起 之前为什么创建了目录
         else
-            \mkdir -p "$x"
+            \mkdir --parent --verbose "$x"
         fi
     done
 }
-# 尽量别覆盖原本的命令名
-# alias mkdir='md'
 
 cl(){
     echo $((`\ls -l | wc -l`-1))
@@ -960,20 +985,24 @@ pid(){
 
 }
 
-# 为啥还是会搜~/.t底下？
 f(){
     if [[ `pwd` == "$HOME/d" || `pwd` == "/d" ]]
     then
         # find 的路径，用$HOME, 别用~,  用双引号括起来
+        echo '被-prune 且在当前目录下的路径：'
         find . \
-        -path "/d/docker" -prune -o  \
-        -path "$HOME/d/docker" -prune -o  \
-        -path "$HOME/d/.t" -prune -o       \
-        -path "$HOME/t" -prune -o       \
-        -path "./.t" -prune -o       \
-        -name "*$1*" | bat
+            -path "/d/docker" -prune -o  \
+            -path "$HOME/d/docker" -prune -o  \
+            -path "$HOME/d/.t" -prune -o       \
+            -path "$HOME/t" -prune -o       \
+            -path "./.t" -prune -o       \
+            -name "*$1*" | le
         echo "当前路径为： ~/d"
         echo "(没进去搜的目录, 仍会输出一行 )"
+    elif  [[ `pwd` == "$HOME/.t" || `pwd` == "/d/.t" ]] ; then
+        find . -name "*$1*" | le
+        echo "当前路径为： .t (垃圾箱)"
+
     else
         # 还是别这样，万一其他路径ln -s到~/d呢
         # if [[ `pwd` == "$HOME" ]]
@@ -982,20 +1011,27 @@ f(){
         # fi
 
         # find 的路径，用$HOME, 别用~,  用双引号括起来
+        echo '当前目录存在的 被-prune的路径：'
         find . \
-        -path "/d/docker" -prune -o  \
-        -path "$HOME/d/docker" -prune -o  \
-        -path "$HOME/d" -prune -o       \
-        -path "./d" -prune -o       \
-        -path "$HOME/d/.t" -prune -o       \
-        -path "$HOME/t" -prune -o       \
-        -path "./.t" -prune -o       \
-        -path "/proc" -prune -o      \
-        -path "/dev" -prune -o      \
-        -name "*$1*" | bat
-        echo "不搜 ~/d 或  /d "
-        echo "(没进去搜的目录, 仍会输出一行 )"
+            -path "$HOME/d/docker" -prune -o \
+            -path "/d/docker" -prune -o      \
+            -path "$HOME/d" -prune -o        \
+            -path "/d" -prune -o             \
+            -path "/proc" -prune -o          \
+            -path "/dev" -prune -o           \
+            -path "./ttt" -prune -o          \
+            -name "*$1*"
+        echo "============不搜 ~/d 或  /d =====\n"
+        #这几种写法 都不起作用 (因为指定了find . 只在当前目录下匹配？）
+                # -path "$HOME/d/测试目录" -prune -o       \
+                # -path "~/测试目录" -prune -o       \
+                # -path "/home/wf/测试目录" -prune -o       \
+                # -path "/home/wf/测试目录" -prune -o       \
+
+        #在$HOME下这样才行 -path "./测试目录" -prune -o
     fi
+    echo 'find命令太复杂了... todo:  https://docstore.mik.ua/orelly/unix3/upt/ch09_09.htm'
+
 }
 
 
@@ -1084,7 +1120,7 @@ mcd() {
 
     #[[ -n "$1" ]] && mkdir -p "$1" && builtin cd "$1"
     #mkdir 会变成上面我自己写的md，有暂时无法解释的bug
-    [[ -n "$1" ]] && \mkdir -p "$1" && builtin cd "$1"
+    [[ -n "$1" ]] && \mkdir --parent --verbose "$1" && builtin cd "$1"
     #-n:
 #   string is not null.
 }
@@ -1102,8 +1138,7 @@ alias rm='nocorrect rm -Irv --preserve-root'
 alias n='zsh'
 
 
-alias to=htop
-alias sm='htop --user=`whoami` --delay=30 --no-colour --tree'  # system monitor
+alias to='htop --user=`whoami` --delay=30 --tree'  # system monitor
 alias top=htop
 alias toc='htop -s %cpu'
 alias tom='htop -s %mem'

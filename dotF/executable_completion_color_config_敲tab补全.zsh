@@ -1,23 +1,21 @@
 
 # todo
-# 好像值得学习
 # https://unix.stackexchange.com/questions/27236/zsh-autocomplete-ls-command-with-directories-only
 
 
 #自动补全功能
 setopt AUTO_LIST
 setopt AUTO_MENU
-setopt MENU_COMPLETE #开启此选项，补全时会直接选中菜单项
+setopt MENU_COMPLETE #补全时 直接选中菜单项
 
 # ':completion:<function>:<completer>:<command>:<argument>:<tag>'
-# tag : a type of match. 常见tags “files”, “domains”, “users”`用户自定义？`, or “options”
-#  即： information displayed during completion
+# 常见tags: “files”, “domains”, “users”`用户自定义？`, or “options”
+# tag : a type of match, information displayed during completion
 
 # ------删掉好像没变化
-##彩色补全菜单
-# eval $(dircolors -b)
-# export ZLSCOLORS="${LS_COLORS}"
-# ------删掉好像没变化
+        ##彩色补全菜单
+        # eval $(dircolors -b)
+        # export ZLSCOLORS="${LS_COLORS}"
 
 # echo $LS_COLORS    得到：
 # :ex=00:no=0:*.csv=00:*.txt=0:fi=47;30:di=30:tw=34;4:ow=34;4:ln=34;4:or=01;05;31:
@@ -29,32 +27,29 @@ setopt MENU_COMPLETE #开启此选项，补全时会直接选中菜单项
 
 zmodload zsh/complist
 
-setopt MENU_COMPLETE
 setopt LIST_ROWS_FIRST
 setopt LIST_PACKED  # 排得更紧凑
-# setopt AUTO_MENU   # 加不加好像都一样
-# CTRL+x i
-# bindkey -M menuselect '^xi' vi-insert
+# CTRL+x i  # interactive
+bindkey -M menuselect '^xi' vi-insert
 
 
 # [[==================================================================================按tab自动补全的东西的颜色
-# zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-# (s.:.) 作用是把 这长串的冒号去掉 :ex=00:no=0:*.csv=00:*.txt=0:
-# (s.e.)  去掉e   regex?  /s/e/
-# 就此打住
+    # zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+    # (s.:.) 作用是把 这长串的冒号去掉 :ex=00:no=0:*.csv=00:*.txt=0:
+    # (s.e.)  去掉e   regex?  /s/e/
 
-zstyle ':completion:*'                          list-colors '=*=0'     #   如果不加这行，可能之前的配置留下了编译后的文件，导致不想要的老效果还留着
-zstyle ':completion:*:commands'                 list-colors '=*=32'
-zstyle ':completion:*:options'                  list-colors '=^(| *)=34'     # `^` 表示取反  * 表示任意
+    zstyle ':completion:*'                          list-colors '=*=0'     #   如果不加这行，可能之前的配置留下了编译后的文件，导致不想要的老效果还留着
+    zstyle ':completion:*:commands'                 list-colors '=*=32'
+    zstyle ':completion:*:options'                  list-colors '=^(| *)=34'     # `^` 表示取反  * 表示任意
 
-# zstyle ':completion:*:*:kill:*'                 list-colors '=(#b) #([0-9]#)*( *[a-z])*=34=31=33'
-zstyle ':completion:*:*:kill:*:processes'       list-colors '=(#b) #([0-9]#)*=0=01;31'
+    # zstyle ':completion:*:*:kill:*'                 list-colors '=(#b) #([0-9]#)*( *[a-z])*=34=31=33'
+    zstyle ':completion:*:*:kill:*:processes'       list-colors '=(#b) #([0-9]#)*=0=01;31'
 
-# zstyle ':completion:*:aliases'                list-colors '=*=2;38;5;128'
-# zstyle ':completion:*:builtins'                 list-colors '=*=38;5;142'
+    # zstyle ':completion:*:aliases'                list-colors '=*=2;38;5;128'
+    # zstyle ':completion:*:builtins'                 list-colors '=*=38;5;142'
 
-# zstyle ':completion:*:parameters'               list-colors '=*=32'
-#
+    # zstyle ':completion:*:parameters'               list-colors '=*=32'
+    #
 # ==================================================================================按tab自动补全的东西的颜色 ]]
 
 zstyle ':completion:*' list-separator '|'
@@ -62,25 +57,26 @@ zstyle ':completion:*' file-list false  # 太啰嗦
 
 
 ##[[------------------------过滤external-command---------------------
-zstyle ':completion:*:matches' group 'yes'
-zstyle ':completion:*' group-name ''
-##加了没变化:
-# zstyle ':completion:*:*:-command-:*' group-order 'alias external-command local-directories'
-# zstyle ':completion:*:*:-command-:*' group-order local-directories
-zstyle ':completion:*:*:-command-:*:*' group-order alias functions commands builtins  #` -command- means any word in the “command position”. ` 没懂
+    zstyle ':completion:*:matches' group 'yes'
+    zstyle ':completion:*' group-name ''
+    ##加了没变化:
+    # zstyle ':completion:*:*:-command-:*' group-order 'alias external-command local-directories'
+    # zstyle ':completion:*:*:-command-:*' group-order local-directories
+    zstyle ':completion:*:*:-command-:*:*' group-order alias functions commands builtins  #` -command- means any word in the “command position”. ` 没懂
 
-##加了没变化:
-#zstyle ':completion:*:*:-command-:*' ignored-patterns 'external-command'
+    ##加了没变化:
+    #zstyle ':completion:*:*:-command-:*' ignored-patterns 'external-command'
 
-zstyle ':completion:*:complete:-command-:*:*' tag-order 'external-command' 'local-directories'  # 多个单引号引住的内容，有顺序/优先级：最考前的优先冒出来
+    zstyle ':completion:*:complete:-command-:*:*' tag-order 'external-command' 'local-directories'  # 多个单引号引住的内容，有顺序/优先级：最考前的优先冒出来
+##[[------------------------过滤external-command---------------------
 
-##----------------------过滤external-command---------------------]]
 
 
 zstyle ':completion:*:*sh:*:' tag-order files
 
-zstyle ':completion:*:*:*:*:descriptions' format $'\e[01;33m %d \e[0m'  # 表示补全类型:   %d
-zstyle ':completion:*:(approximate|correct)' format ' %F{yellow}近似__校正_%d for %o (errors: %e)%f'
+# 表示补全类型:   %d
+zstyle ':completion:*:*:*:*:descriptions' format $'\e[01;33m %d \e[0m'
+zstyle ':completion:*:(approximate|correct)' format ' %F{yellow}近似__校正_%d for %o (错误: %e)%f'
 zstyle ':completion:*:*expansions' format ' %F{cyan}扩展_%d for %o%f'
 zstyle ':completion:*:warnings' format $'\e[01;31m 无法补全 \e[0m'
 zstyle ':completion:*:messages' format $'\e[01;35m 补全信息 %d --\e[0m'

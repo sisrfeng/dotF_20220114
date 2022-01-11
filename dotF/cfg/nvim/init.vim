@@ -218,9 +218,9 @@ let g:selecmode="mouse"
 " map <C-Left>
 " map <C-Right>
 
-"  Use 系统粘贴板  "+
+"  系统粘贴板  "+
 inoremap <C-V> "+p
-set clipboard=""  " 默认 就是这样
+set clipboard=""  " 默认就是这样
 if hostname() != 'redmi14-leo'
     set clipboard+=unnamedplus  " vim外也可以粘贴vim的registry了
 else
@@ -352,13 +352,16 @@ if exists('g:vscode')
     " nnoremap M
 
     nnoremap ss <Cmd>call VSCodeNotify('workbench.action.closeActiveEditor')<CR>
+    vnoremap ss <Cmd>call VSCodeNotify('workbench.action.closeActiveEditor')<CR>
     nnorem qq <Cmd>call VSCodeNotify('workbench.action.revertAndCloseActiveEditor')<CR>
     " noremap qq :q!<CR>  vscode里，这样搞只退出插件，文件还打开着
 
 
 else
     nnoremap ss :wq<CR>
+    vnoremap ss :<C-U>wq<CR>
     nnoremap qq :q!<CR>
+    vnoremap qq :<C-U>q!<CR>
     " nnoremap q :wq<CR>  按一次q要等一会才退出， 不如连续按2次快
     " inoremap qq <ESC>:wq<CR>  别这么干，容易在编辑时敲错
 
@@ -598,6 +601,32 @@ xmap ga <Plug>(EasyAlign)
 
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
 nmap ga <Plug>(EasyAlign)
+" \|是竖线的escape   dict里面不能放注释？ shell的换行也是，不像python
+let g:easy_align_delimiters = {
+    \ '>': { 'pattern': '>>\|=>\|>' },
+    \ '\': { 'pattern': '\\$' },
+    \ '/': {
+    \     'pattern':         '//\+\|/\*\|\*/',
+    \     'delimiter_align': 'l',
+    \     'ignore_groups':   ['!Comment'] },
+    \ ']': {
+    \     'pattern':       '[[\]]',
+    \     'left_margin':   0,
+    \     'right_margin':  0,
+    \     'stick_to_left': 0
+    \   },
+    \ ')': {
+    \     'pattern':       '[()]',
+    \     'left_margin':   0,
+    \     'right_margin':  0,
+    \     'stick_to_left': 0
+    \   },
+    \ 'd': {
+    \     'pattern':      ' \(\S\+\s*[;=]\)\@=',
+    \     'left_margin':  0,
+    \     'right_margin': 0
+    \   }
+    \ }
 
 " [[==============================easymotion 配置=====================begin
 
@@ -657,10 +686,63 @@ Plug 'machakann/vim-sandwich'
 
 
 Plug 'scrooloose/nerdcommenter'
+
+
+
 Plug  'Yggdroot/LeaderF'
+" >>>---------------------------------------------------------------------LeaderF
+" don't show the help in normal mode
+let g:Lf_HideHelp = 1
+let g:Lf_UseCache = 0
+let g:Lf_UseVersionControlTool = 0
+let g:Lf_IgnoreCurrentBufferName = 1
+
+
+" popup mode
+let g:Lf_WindowPosition = 'popup'
+let g:Lf_PreviewInPopup = 1
+let g:Lf_StlSeparator = { 'left': "\ue0b0", 'right': "\ue0b2", 'font': "DejaVu Sans Mono for Powerline" }
+let g:Lf_PreviewResult = {'Function': 0, 'BufTag': 0 }
+
+" let g:Lf_ShortcutF = "<leader>o"
+let g:Lf_ShortcutF = "<leader>f"  " 要想快点弹出窗口，按下f后，马上输出字符
+" mru: most recently used file
+" C-u: 清楚cmdline的字符。很多插件都这么设
+    nnoremap <leader>fm :<C-U><C-R>=printf("Leaderf mru %s", "")<CR><CR>
+" Launch LeaderF to search a line in current buffer.  " 有点vscode下的感觉
+    nnoremap <leader>/ :<C-U><C-R>=printf("Leaderf line %s", "")<CR><CR>
+" <cword> is replaced with the word under the cursor (like |star|)
+    " nnoremap <C-B> :<C-U><C-R>=printf("Leaderf! rg --current-buffer -e %s ", expand("<cword>"))<CR><CR>
+    " 删掉了叹号
+    "  LeaderfFunction! 叹号版本直接打开 normal 模式，并且定位到对应位置
+    nnoremap <C-B> :<C-U><C-R>=printf("Leaderf rg --current-buffer -e %s ", expand("<cword>"))<CR><CR>
+    " 不确定是否靠谱  " 代替在zsh中用rg
+    nnoremap <C-F> :<C-U><C-R>=printf("Leaderf rg -g '!*.zsh_history' -g '!*.lesshst' -g '!/data1/weifeng_liu/.large_trash' ")<CR><CR>
+    " 这个不起作用，不能ctrl+shift？
+    " nnoremap <C-S-F> :<C-U><C-R>=printf("Leaderf! rg -e %s ", expand("<cword>"))<CR><CR>
+    " nnoremap <C-S-F> :<C-U><C-R>=printf("Leaderf! rg -e ")<CR><CR>
+
+" search visually selected text literally
+" xnoremap gf :<C-U><C-R>=printf("Leaderf! rg -F -e %s ", leaderf#Rg#visual())<CR>
+" noremap go :<C-U>Leaderf! rg --recall<CR>
+
+" should use `Leaderf gtags --update` first
+let g:Lf_GtagsAutoGenerate = 0
+let g:Lf_Gtagslabel = 'native-pygments'
+" noremap <leader>fr :<C-U><C-R>=printf("Leaderf! gtags -r %s --auto-jump", expand("<cword>"))<CR><CR>
+" noremap <leader>fd :<C-U><C-R>=printf("Leaderf! gtags -d %s --auto-jump", expand("<cword>"))<CR><CR>
+" noremap <leader>fo :<C-U><C-R>=printf("Leaderf! gtags --recall %s", "")<CR><CR>
+" noremap <leader>fn :<C-U><C-R>=printf("Leaderf gtags --next %s", "")<CR><CR>
+" noremap <leader>fp :<C-U><C-R>=printf("Leaderf gtags --previous %s", "")<CR><CR>
+" ---------------------------------------------------------------------<<<LeaderF
+
+
+
+
 Plug 'sisrfeng/toggle-bool'
 
-noremap <leader>r :ToggleBool<CR>
+" leaderf里有这个keybind，我这里覆盖掉
+noremap <leader>b :ToggleBool<CR>
 
 Plug 'mbbill/undotree'
 if has('persistent_undo')
@@ -698,7 +780,6 @@ let g:undotree_SetFocusWhenToggle = 1
 " https://github.com/pechorin/any-jump.vim
 
 call plug#end()
-" =============================================vim-plug===============================end
 
 
 if has('win32')
@@ -1286,51 +1367,6 @@ nnoremap U <C-r>
 nnoremap <C-E> $
 
 
-" >>>---------------------------------------------------------------------LeaderF
-" don't show the help in normal mode
-let g:Lf_HideHelp = 1
-let g:Lf_UseCache = 0
-let g:Lf_UseVersionControlTool = 0
-let g:Lf_IgnoreCurrentBufferName = 1
-
-
-" popup mode
-let g:Lf_WindowPosition = 'popup'
-let g:Lf_PreviewInPopup = 1
-let g:Lf_StlSeparator = { 'left': "\ue0b0", 'right': "\ue0b2", 'font': "DejaVu Sans Mono for Powerline" }
-let g:Lf_PreviewResult = {'Function': 0, 'BufTag': 0 }
-
-" let g:Lf_ShortcutF = "<leader>o"
-let g:Lf_ShortcutF = "<leader>f"  " 要想快点弹出窗口，按下f后，马上输出字符
-" mru: most recently used file
-" C-u: 清楚cmdline的字符。很多插件都这么设
-    nnoremap <leader>fm :<C-U><C-R>=printf("Leaderf mru %s", "")<CR><CR>
-" Launch LeaderF to search a line in current buffer.  " 有点vscode下的感觉
-    nnoremap <leader>/ :<C-U><C-R>=printf("Leaderf line %s", "")<CR><CR>
-" <cword> is replaced with the word under the cursor (like |star|)
-    " nnoremap <C-B> :<C-U><C-R>=printf("Leaderf! rg --current-buffer -e %s ", expand("<cword>"))<CR><CR>
-    " 删掉了叹号
-    "  LeaderfFunction! 叹号版本直接打开 normal 模式，并且定位到对应位置
-    nnoremap <C-B> :<C-U><C-R>=printf("Leaderf rg --current-buffer -e %s ", expand("<cword>"))<CR><CR>
-    " 不确定是否靠谱  " 代替在zsh中用rg
-    nnoremap <C-F> :<C-U><C-R>=printf("Leaderf rg -g '!*.zsh_history' -g '!*.lesshst' -g '!/data1/weifeng_liu/.large_trash' ")<CR><CR>
-    " 这个不起作用，不能ctrl+shift？
-    " nnoremap <C-S-F> :<C-U><C-R>=printf("Leaderf! rg -e %s ", expand("<cword>"))<CR><CR>
-    " nnoremap <C-S-F> :<C-U><C-R>=printf("Leaderf! rg -e ")<CR><CR>
-
-" search visually selected text literally
-" xnoremap gf :<C-U><C-R>=printf("Leaderf! rg -F -e %s ", leaderf#Rg#visual())<CR>
-" noremap go :<C-U>Leaderf! rg --recall<CR>
-
-" should use `Leaderf gtags --update` first
-let g:Lf_GtagsAutoGenerate = 0
-let g:Lf_Gtagslabel = 'native-pygments'
-" noremap <leader>fr :<C-U><C-R>=printf("Leaderf! gtags -r %s --auto-jump", expand("<cword>"))<CR><CR>
-" noremap <leader>fd :<C-U><C-R>=printf("Leaderf! gtags -d %s --auto-jump", expand("<cword>"))<CR><CR>
-" noremap <leader>fo :<C-U><C-R>=printf("Leaderf! gtags --recall %s", "")<CR><CR>
-" noremap <leader>fn :<C-U><C-R>=printf("Leaderf gtags --next %s", "")<CR><CR>
-" noremap <leader>fp :<C-U><C-R>=printf("Leaderf gtags --previous %s", "")<CR><CR>
-" ---------------------------------------------------------------------<<<LeaderF
 
 
 
@@ -1561,3 +1597,4 @@ set laststatus=2  "  always show statusline
 " the following lines in your current colorscheme file.
 " hi User1 guifg=#ffdad8  guibg=#880c0e
 
+" =============================================vim-plug===============================end

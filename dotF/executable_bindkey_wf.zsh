@@ -26,7 +26,7 @@ stty lnext "^s"  # 要  双引号括起来
 
 bindkey '^S' quoted-insert
 bindkey '^_' push-line-or-edit
-# bindkey '^u'   # tmux里设了
+bindkey -s '^u' 'echo "hi" \n'
 bindkey '^q' push-line-or-edit  # ctrl s能改，这行为啥不生效? 一直是删除整行
 # =====================================================================<_<_<
 
@@ -359,7 +359,7 @@ function peco-find-file() {
 zle -N peco-find-file
 bindkey '^F' peco-find-file
 
-function peco-history-selection() {
+function peco-history() {
     local tac
     # GNU 'tail' can output any amount of data (some other versions of 'tail' cannot).
     # It also has no '-r' option (print in reverse), since reversing a file is really a different job from printing the end of a file;
@@ -395,8 +395,7 @@ function peco-history-selection() {
 
      # 我没存peco的源码 “Yes, it is a single binary! You can put it anywhere you want"
 }
-zle -N peco-history-selection
-# bindkey '^R' peco-history-selection  # 放到bindkey_wf.zsh里
-bindkey '^R' peco-history-selection
+zle -N peco-history
+bindkey '^R' peco-history
 
 bindkey -s "\C-q" "echo 'ctrl-q: 待用' \n"

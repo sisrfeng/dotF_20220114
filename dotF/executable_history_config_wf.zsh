@@ -6,10 +6,13 @@ setopt EXTENDED_HISTORY          # Write the history file in the ":start:elapsed
 # : 1471766804:3;git push origin master
 # 3表示3秒
 
+# https://zsh.sourceforge.io/Doc/Release/Options.html
 # 3选一：
 # setopt SHARE_HISTORY             # Share history between all sessions.
 # setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
-setopt INC_APPEND_HISTORY_TIME   # 上面一行。使得记录的elapsed time准确
+setopt INC_APPEND_HISTORY_TIME     # 命令执行结束后，才写进.zsh_history, 使得记录的elapsed time准确
+# 要想最灵活，就设置这个。
+# 可以import commands whenever you need them using ‘fc -RI’.
 
 # 不行：
 # if [[ -f "$HOME/.zsh_history" ]]  # -f:  regular fie
@@ -19,13 +22,16 @@ setopt INC_APPEND_HISTORY_TIME   # 上面一行。使得记录的elapsed time准
     # HISTFILE="$HOME/.history_zsh"
 # fi
 
-export HISTFILE="$HOME/.zsh_history"
+# export HISTFILE="$HOME/.zsh_history"  # 不用export，interactive shell要调用~/.zshrc这个文件,
+# 进而调用该文件。bash和zsh认 同一个环境变量吧，sh和tch等也是？
+# 有的文章教人加上export
+HISTFILE="$HOME/.zsh_history"
+# HISTFILE="$HOME/.history_zsh"
 
-export HISTSIZE=1000000   # the number of items for the internal history list (一个zsh session自己的历史)
-export SAVEHIST=1000000   # maximum number of items for the history file
+export HISTSIZE=999999999   # the number of items for the internal history list (一个zsh session自己的历史)
+export SAVEHIST=999999999   # maximum number of items for the history file  这个大，相当于无穷了
 
-
-# 设了这个，不利于回顾历史 反思总结
+#  设了这个，不利于回顾历史 反思总结
 # setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicate entries first when trimming history.
 # setopt HIST_IGNORE_DUPS          # Do not enter command lines into the history list if they are duplicates of the previous even
 # setopt HIST_IGNORE_ALL_DUPS      # Delete old recorded entry if new entry is a duplicate.

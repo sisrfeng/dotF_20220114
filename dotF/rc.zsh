@@ -395,8 +395,33 @@ export XDG_CONFIG_HOME="$HOME/.config"  # 感觉这个稳妥点
 # source "$HOME/dotF/fuzzyF/shell/key-bindings.zsh"
 # end=====================================================================<_<_<
 
-source ~/dotF/zsh-git-prompt/zshrc.sh
-# an example prompt
-PROMPT='%B%m%~%b$(git_super_status) %# '
 
-# 使用chezmoi代替自己git
+source ~/dotF/zsh-git-prompt/zshrc.sh
+换行=$'\n'
+上行=$'\e[1A'
+上行=$'\e[1B'
+
+autoload -U colors
+colors
+# https://void-shana.moe/linux/customize-your-zsh-prompt.html
+# 放文件开头时，颜色时有时无
+# https://zsh.sourceforge.io/Doc/Release/Prompt-Expansion.html#Prompt-Expansion
+# export PS1="%{$fg[cyan]%}【82服务器】%~       %T_周%w号"${换行}">%{$reset_color%}"
+# 不加下面这行，改了conda环境时，才显示（环境名）
+
+PS1="${换行}%{${CONDA_PROMPT_MODIFIER}"
+PS1+="$fg[cyan]%}%~${换行}"
+PS1+="%{$reset_color%}"
+PS1+=">"
+export PS1
+
+function precmd {
+    export RPS1='$(git_super_status)'
+}
+
+export PS2="%{$fg[cyan]%}%_>%{$reset_color%}"
+export RPS2="%{$fg[cyan]%} 换行后继续敲  %{$reset_color%}"
+# 别加$bg[white]:
+# export RPS2="%{$fg[cyan]$bg[white]%} 换行后继续敲  %{$reset_color%}"
+
+export RANGER_LOAD_DEFAULT_RC=FALSE

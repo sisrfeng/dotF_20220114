@@ -12,3 +12,6 @@
 	ci = commit
 	st = status
 	co = checkout
+	ck = checkout
+[push]
+	default = current
