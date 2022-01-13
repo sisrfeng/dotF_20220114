@@ -78,11 +78,12 @@ else
 fi
 
 # exit for non-interactive shell:
-# `$-` : 获取“-”这个变量的值(类似于$PAHT  $HOME)。他表示zsh -c 等参数(类似rm -rf中的r和f)，又称flag
+# `$-` : 获取“-”这个变量的值(类似于$PATH  $HOME)。他表示zsh -c 等参数(类似rm -rf中的r和f)，又称flag
 # i: 表示interactive，[但自动补全时，显示I h等，不显示i，因为没有意义] --
     # 只敲zsh时，默认就是进了交互式程。
     # 另外，在bash命令行下，敲zsh -i my_echo.sh，echo里面的东西之后，还是回到bash
 [[ $- != *i* ]] && return
+
 
 if [ -d "$HOME/.local/bin" ]; then
     export PATH="$HOME/.local/bin:$PATH"
@@ -91,9 +92,9 @@ fi
 if [ -d "$HOME/bin" ]; then
     export PATH="$HOME/bin:$PATH"
 fi
-
-export PAHT="$PATH:/usr/lib/w3m/w3mimagedisplay"
-export PAHT="$PATH:$HOME/dotF/bin_wf:$HOME/dotF/exa/bin"
+#
+# 之前把PATH拼错成PAHT了
+export PATH="$PATH:$HOME/dotF/bin_wf:/snap/bin"
 
 # https://zsh.sourceforge.io/Intro/intro_6.html
 DIRSTACKSIZE=15 # Setup dir stack
@@ -369,8 +370,8 @@ export BAT_THEME="gruvbox-light"
 
 
 
-export PATH=$PATH:/usr/local/go/bin
-export PATH="$PATH:$HOME/dotF/bin_wf:/snap/bin"
+export PATH="$PATH:/usr/local/go/bin"
+
 
 # export XDG_CONFIG_HOME=$HOME/dotF/cfg
 export XDG_CONFIG_HOME="$HOME/.config"  # 感觉这个稳妥点
@@ -409,7 +410,8 @@ colors
 # export PS1="%{$fg[cyan]%}【82服务器】%~       %T_周%w号"${换行}">%{$reset_color%}"
 # 不加下面这行，改了conda环境时，才显示（环境名）
 
-PS1="${换行}%{${CONDA_PROMPT_MODIFIER}"
+# PS1="${换行}%{${CONDA_PROMPT_MODIFIER}"
+PS1="%{${CONDA_PROMPT_MODIFIER}"
 PS1+="$fg[cyan]%}%~${换行}"
 PS1+="%{$reset_color%}"
 PS1+=">"

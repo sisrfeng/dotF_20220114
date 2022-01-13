@@ -7,6 +7,11 @@ alias '$'='' # 省去删掉复制来的命令 最前面的$
 alias omg='chezmoi'
 alias x='git'
 
+
+# 多加一个找manpage的路径
+# -M 指定manpath
+alias man='man -M "$(manpath -g):~/dotF/man_wf"'
+
 # 在~/dotF/bin_wf 下
 alias names='massren'
 alias rename='massren'
@@ -512,7 +517,7 @@ date_leo(){
 
 # $chpwd_functions:  shell parameter (an array of function names.)
 # All of these functions are executed `in order` when changing the current working directory.
-# 类似PAHT=$PATH:某目录，  我猜这么append函数名
+# 类似PATH=$PATH:某目录，  我猜这么append函数名
 # chpwd_functions=(${chpwd_functions[@]} "函数1")
 #
 
@@ -817,6 +822,9 @@ gg(){
 # 我最新的配置 真是yyds
 yy(){
     echo "\n--------------------------------add commit push三连-----------------------------------------------"
+    cd $(chezmoi source-path)
+    # oh my git ( 其实是chezmoi）
+    omg add ~/dotF/*
     git add --verbose  --all .
     if [[ "$1" != "" ]]  # if [[ "$1" == "" ]] 容易出bug？一般都不这么写
     then
@@ -828,7 +836,7 @@ yy(){
     git push --quiet  #  只在出错时有输出
     # git push 2>&1 >~/.t/git_push的stdout  # 不行
     cd -
-    exit
+    zsh
 }
 # yy(){
 #     # echo "\n--------------------------------4. add commit push三连-----------------------------------------------"
