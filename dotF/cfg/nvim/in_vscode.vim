@@ -27,7 +27,7 @@ omap <silent> k gk
 
 nnoremap ss <Cmd>call VSCodeNotify('workbench.action.closeActiveEditor')<CR>
 vnoremap ss <Cmd>call VSCodeNotify('workbench.action.closeActiveEditor')<CR>
-nnorem qq <Cmd>call VSCodeNotify('workbench.action.revertAndCloseActiveEditor')<CR>
+nnoremap qq <Cmd>call VSCodeNotify('workbench.action.revertAndCloseActiveEditor')<CR>
 " noremap qq :q!<CR>  vscode里，这样搞只退出插件，文件还打开着
 "end=====================================================================<_<_<
 "

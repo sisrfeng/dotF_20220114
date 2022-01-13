@@ -14,5 +14,9 @@
             }
         ],
         "comments": ""
-    }
+    },
+    "cSpell.language": "en,en-US",
+    "cSpell.enableFiletypes": [
+        "!shellscript"
+    ]
 }

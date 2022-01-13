@@ -7,6 +7,7 @@ alias '$'='' # 省去删掉复制来的命令 最前面的$
 alias omg='chezmoi'
 alias x='git'
 
+alias u='unset ALL_PROXY'
 
 # 多加一个找manpage的路径
 # -M 指定manpath
