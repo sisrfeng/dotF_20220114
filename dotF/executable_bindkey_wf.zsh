@@ -1,3 +1,9 @@
+# zsh does not use readline, instead it uses its own and more powerful Zsh Line Editor (ZLE). It does not read /etc/inputrc or ~/.inputrc.
+# todo: https://sgeb.io/posts/zsh-zle-custom-widgets/
+#
+#
+# ./stty_out.yml 有stty对终端输入的设置
+
 # Ctrl+S is normally STOP (freeze output to the terminal)
 # and Ctrl+Q is normally START (unfreeze).
 # You may not be able to change this value, because
@@ -32,7 +38,7 @@ bindkey '^q' push-line-or-edit  # ctrl s能改，这行为啥不生效? 一直�
 
 
 
-bindkey -s '^[^?' 'echo "待用" \n'  # ASCII DEL == 0x7f == 0177 == ^?
+bindkey -s '^[^?' 'echo "line 35" \n'  # ASCII DEL == 0x7f == 0177 == ^?
 
 
 # bindkey "^C" self-insert  # 原样输入
@@ -398,4 +404,8 @@ function peco-history() {
 zle -N peco-history
 bindkey '^R' peco-history
 
+# https://github.com/ohmyzsh/ohmyzsh/issues/7609
 bindkey -s "\C-q" "echo 'ctrl-q: 待用' \n"
+bindkey -s "\C-H" "被tmux占用，tmux里外都是： 和ctrl H一样 \n"
+# bindkey -s "^[" "和esc同体，别改！"
+bindkey -s "\ei" 'ln -s "$(pwd)/"'

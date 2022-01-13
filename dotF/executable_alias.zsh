@@ -880,9 +880,11 @@ compdef _dirs d  # compdef: 一个函数，定义自动补全。让函数d能被
 
 # global alias，有点危险， 别用
 # alias -g ...='../..'
-
-alias -- _='cd -'
-alias -- -='cd -'
+#
+# 什么特殊语法？
+alias _='待用'
+alias -- -='cd -'  # 和下面这行一样？
+alias -- -='cd -1'
 
 alias ..='cd ..'
 alias ...='cd ../..'
@@ -1135,6 +1137,7 @@ alias rm='nocorrect rm -Irv --preserve-root'
 
 # n:  new zsh
 # alias o='source ~/.zshrc'  # 有时source后，alias就算在文件中被删了，还在"
+alias o='zsh' # 敲习惯了
 alias n='zsh'
 
 
@@ -1324,3 +1327,4 @@ h(){
 }
 # 在zshrc里设置了代理，这里不用设
 alias goo='googler'
+

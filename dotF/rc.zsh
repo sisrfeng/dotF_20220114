@@ -415,9 +415,9 @@ PS1+="%{$reset_color%}"
 PS1+=">"
 export PS1
 
-function precmd {
-    export RPS1='$(git_super_status)'
-}
+# function precmd {
+#     export RPS1='$(git_super_status)'
+# }
 
 export PS2="%{$fg[cyan]%}%_>%{$reset_color%}"
 export RPS2="%{$fg[cyan]%} 换行后继续敲  %{$reset_color%}"
@@ -425,3 +425,4 @@ export RPS2="%{$fg[cyan]%} 换行后继续敲  %{$reset_color%}"
 # export RPS2="%{$fg[cyan]$bg[white]%} 换行后继续敲  %{$reset_color%}"
 
 export RANGER_LOAD_DEFAULT_RC=FALSE
+

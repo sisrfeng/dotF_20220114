@@ -1,6 +1,73 @@
+" :h只要路径
+" https://github.com/vim/vim/issues/6793
+" Register % contains the name of the current file.
+" 这3行结果貌似一样, expand和fnamemodify只有细微区别？
+" let $no_vscode = expand('%:h') . "/no_vscode.vim"
+" let $no_vscode = fnamemodify('%',':h') . "/no_vscode.vim"
+let $no_vscode = fnamemodify($MYVIMRC,':h') . "/no_vscode.vim"
+let $in_vscode = fnamemodify($MYVIMRC,':h') . "/in_vscode.vim"
+
+
+nnoremap <c-d> 15<c-d>
+nnoremap <c-u> 15<c-u>
+
+" 禁用netrw，不过应该用不着了。我删掉了对应文件
+" let g:loaded_netrw       = 1
+" let g:netrw_banner=0
+" let g:loaded_netrwPlugin = 1
+"
+
+" 让配置变更立即生效
+" >_>_>===================================================================begin
+" 1.  `:augroup {name}`
+" 	Define the autocmd group name for the  following ":autocmd"
+augroup Reload
+
+" 2. Delete any old autocommands  `:help autocmd-remove`
+autocmd!
+
+" 或者： 先在group内删除匹配{event}和{pat}的autocmd，再定义新的cmd
+":autocmd! [group]   {event}     {pat}      {cmd}
+" autocmd! Reload BufWritePost $MYVIMRC  echom '改了init.vim'
+
+" When resourcing vimrc always use autocmd-nested  因为autocmd执行时 会又遇到autocmd
+" ++nested 在老版本中是nested
+                                                                                " 点号拼接字符串
+autocmd Reload BufWritePost $MYVIMRC    ++nested   source $MYVIMRC | echom "更新了"."init.vim "| redraw
+autocmd Reload BufWritePost $no_vscode  ++nested   source $MYVIMRC | echom '根据环境变量，改了no_vscode.vim, 加载了init.vim' | redraw
+autocmd Reload BufWritePost $in_vscode  ++nested   source $MYVIMRC | echom '(改了in_vscode.vim, 更新init.vim)'  | redraw
+
+" 4. Go back to the default group, named "end"
+augroup end
+" end=====================================================================<_<_<
+
+
+nnoremap gf :tabedit <cfile><CR>
+
+
+" =============================================================
+" block模式
+" 记忆：c for block
+" c发音:ke
+nnoremap <c-c> <c-v>
+" 变成^  作用是 显示ASCII码 （以^H等方式显示一些控制字符）
+cnoremap <c-c> <c-v>
+" vscod里不生效：
+inoremap <c-c> <c-v>
+
+" 加了几行，还是粘贴
+" inoremap <c-v> <c-v>
+" cnoremap <c-v> <c-v>
+" nnoremap <c-v> <c-v>
+"
+" 加了这两行，还是删除到行首
+" cnoremap <c-q> <c-v>
+" inoremap <c-q> <c-v>
+"
+" =============================================================
+
+
 set iskeyword+=-
-
-
 
 " >_>_>1. filetype not search comment========================================begin
 " filetype        on        " 检测文件类型
@@ -17,36 +84,36 @@ filetype plugin indent on " 实现了上面3行
 filetype detect
 " echom "文件类型是"
 " echom &filetype
-" echom "文件类型输出结束】"
+" echom "文件类型输出结束"
 
 
 let mapleader =" "
 
 set hlsearch " 高亮search
-" nnoremap <silent><leader>/ :nohls<CR> " 搜索时 不高亮
-nnoremap <Leader>set hlsearch!<CR>
+" s: search set highlight
+nnoremap <Leader>ss :set hlsearch!<CR>
 
 
 " >_>_>1.1 =====================================================begin
 " " 自动取消高亮
-" let s:current_timer = -1
+let s:current_timer = -1
 
-" func Highlight_Search_Off(timerId)
-"   set hlsearch!
-" endfunc
+func Highlight_Search_Off(timerId)
+  set hlsearch!
+endfunc
 
-" func ResetTimer()
-"   if s:current_timer > -1
-    " call timer_stop(s:current_timer)
-"   endif
-"   " 2秒
-"   let s:current_timer = timer_start(1000, 'Highlight_Search_Off')
-" endfuc
+func ResetTimer()
+  if s:current_timer > -1
+    call timer_stop(s:current_timer)
+  endif
+  " 第一个参数：按键多少秒后 自动取消
+  let s:current_timer = timer_start(1000, 'Highlight_Search_Off')
+endfunc
 
 
-" nnoremap N N:call ResetTimer()<CR>
-" nnoremap n n:call ResetTimer()<CR>
-" end========================================================<_<_<1.1
+nnoremap N N:call ResetTimer()<CR>
+nnoremap n n:call ResetTimer()<CR>
+" end========================================================<_<_<
 
 
 " >_>_>===================================================================begin
@@ -86,46 +153,6 @@ nnoremap g/ msgg/
 
 
 
-if !exists('g:vscode')
-    " cnoremap s/ s/\v
-    " vscode里，用了camp时，必须在光标后有字符才能正常map
-
-    " <expr> 指明了right hand side是表达式
-    " cnoremap    <expr> bd    getcmdtype() == ":" && getcmdline() == 'bd'   ? 'tabedit ~/.zshrc' : 'tabedit'
-    " bd 本来是buffer delete的意思。现在用bde代替吧
-    cnoreabbrev <expr> bd    getcmdtype() == ":" && getcmdline() == 'bd'   ? 'tabedit ~/.zshrc' : 'bd'
-    cnoreabbrev <expr> e     getcmdtype() == ":" && getcmdline() == 'e'   ? 'tabedit' : 'e'
-    cnoreabbrev <expr> et    getcmdtype() == ":" && getcmdline() == 'et'   ? 'tabedit ~/d/tmp.py' : 'et'
-    cnoreabbrev <expr> tc    getcmdtype() == ":" && getcmdline() == 'tc'   ? 'tabedit ~/dotF/cfg/tmux/tmux.conf' : 'tc'
-    cnoreabbrev <expr> in    getcmdtype() == ":" && getcmdline() == 'in'  ? 'tabedit ~/dotF/cfg/nvim/init.vim' : 'in'
-    cnoreabbrev <expr> s     getcmdtype() == ":" && getcmdline() == 's'   ? 'tabedit ~/dotF/rc.zsh' : 's'
-    cnoreabbrev <expr> al    getcmdtype() == ":" && getcmdline() == 'al'   ? 'tabedit ~/dotF/alias.zsh' : 'al'
-    cnoreabbrev <expr> map   getcmdtype() == ":" && getcmdline() == 'map'   ? 'verbose map' : 'map'
-    cnoreabbrev <expr> imap  getcmdtype() == ":" && getcmdline() == 'imap'   ? 'verbose imap' : 'imap'
-    cnoreabbrev <expr> cmap  getcmdtype() == ":" && getcmdline() == 'cmap'   ? 'verbose cmap' : 'cmap'
-    cnoreabbrev <expr> cm    getcmdtype() == ":" && getcmdline() == 'cm'   ? 'tab help' : 'cm'
-    cnoreabbrev <expr> h     getcmdtype() == ":" && getcmdline() == 'h'   ? 'tab help' : 'h'
-    cnoreabbrev <expr> cfg   getcmdtype() == ":" && getcmdline() == 'cfg'   ? 'cd ~/dotF/cfg' : 'cfg'
-    cnoreabbrev <expr> mdf   getcmdtype() == ":" && getcmdline() == 'mdf'   ? 'cd ~/dotF/' : 'mdf'
-    cnoreabbrev <expr> ~/   getcmdtype()  == ":" && getcmdline() == '~/'   ? 'cd ~/' : '~/'
-
-    " abbrev 和map的区别，就像ahk里 hotkey和hotstring
-
-    " cnoremap ,in tabedit ~/dotF/cfg/nvim/init.vim
-
-
-    " abbrev
-    " >_>_>==========================================================begin
-    " 触发： space, Escape, or Enter.
-    abbrev nore noremap
-    inoreabbrev ali alias
-    inoreabbrev ali alias
-    inoreabbrev al alias
-    inoreabbrev df ~/dotF/
-    inoreabbrev HO $HOME/
-
-endif
-" end===================================================================<_<_< 1.
 
 " U is seldom useful in practice,U 本身的功能，不及C-R
 nnoremap U <C-R>
@@ -148,21 +175,9 @@ let g:selecmode="mouse"
 " `:autocmd` adds to the list of autocommands regardless of whether they are
         " already present.  When your .vimrc file is sourced twice, the autocommands
         " will appear twice.  To avoid this, define your autocommands in a group, so
-        " that you can easily clear them: >
+        " that you can easily clear them:
 
-" 让配置变更立即生效
-    " 1. Select the group with `:augroup {name}`
-    " :aug[roup] {name}		Define the autocmd group name for the
-    "                 following ":autocmd" commands. 
-    augroup wf_reload
-        " 2. Delete any old autocommands  `:help autocmd-remove`
-        autocmd!  
-        " 3. Define the autocommands.   %（百分号）表示当前文件  " 下面这个的！不表示remove
-        autocmd! BufWritePost $MYVIMRC,$MYGVIMRC nested source % | echom '改了init.vim'
-        " 4. Go back to the default group：  END
-    augroup end
-    " The name "end" selects the default group.
-    "
+
 
 " When a function by this name already exists and [!] is
 " not used an error message is given.  There is one
@@ -177,7 +192,7 @@ let g:selecmode="mouse"
 " which is hard to debug.
 
 " 改了 beautify_wf并保存后， 保存init.vim会说function already exist
-" 些别想着避免这个问题，毕竟很少改init.vim以外的文件. 
+" 些别想着避免这个问题，毕竟很少改init.vim以外的文件.
 " https://github.com/xolox/vim-reload
 
 
@@ -249,11 +264,16 @@ nnoremap <Down> <C-I>
 vnoremap <Down> <Esc><C-I>
 
 
-"       %       表示全文. Example: :%s/foo/bar/g.
-"       $       表示结尾
-"       .       当前行
-"       .,$     from the current line to the end of the file.
-nnoremap <F2> :.,$s#\<\>##gc<Left><Left><Left><Left><Left><Left><C-R><C-W><Right><Right><Right><C-R><C-W>
+" :[range]s[ubstitute]/{pattern}/{string}/[flags] [count]
+nnoremap <F2> :    .,$subs  #\<\>##gc<Left><Left><Left><Left><Left><Left><C-R><C-W><Right><Right><Right><C-R><C-W>
+nnoremap <M-F2> :  .,$subs  ###gc<Left><Left><Left><Left><C-R><C-W><Right>
+    "       %       表示全文. Example: :%s/foo/bar/g.
+    "       .       当前行
+    "       $       表示结尾
+    "       .,$     from the current line to the end of the file.
+                                " 这些不能作为delimiter : 双引号， 竖线， backslash
+                                " 其他single-byte character都可以
+
 
 
 
@@ -317,81 +337,6 @@ autocmd BufReadPost *
 " end-------------------------------------------------------------】】
 
 
-
-if &diff
-    " 反应变慢，不好
-    " map ] ]c
-    " map [ [c
-endif
-" map 默认是recursive的
-
-if exists('g:vscode')
-    "set wrap 后，同物理行上线直接跳。
-    "  they are not recursively mapped themselves (I don't know why this matters) but
-    "  you can still recursively map to them.
-    map j gj
-    map k gk
-
-    " 还是跳到物理行的 空白开头 ? 现在是跳到非空白开头了，是vscode的设置起效了？
-    map H g0
-    " nmap H g$<ESC>wk
-    map 0 g0
-    map L g$
-
-    omap <silent> j gj
-    omap <silent> k gk
-    " 不好：
-        " nmap dd g^dg$i<BS><Esc>
-        " nmap yy g^yg$
-        " nmap cc g^cg$
-    " 不行：
-        " nmap A g$a
-        " nmap I g^i
-
-    " nmap gm g$
-    " nnoremap M
-
-    nnoremap ss <Cmd>call VSCodeNotify('workbench.action.closeActiveEditor')<CR>
-    vnoremap ss <Cmd>call VSCodeNotify('workbench.action.closeActiveEditor')<CR>
-    nnorem qq <Cmd>call VSCodeNotify('workbench.action.revertAndCloseActiveEditor')<CR>
-    " noremap qq :q!<CR>  vscode里，这样搞只退出插件，文件还打开着
-
-
-else
-    nnoremap ss :wq<CR>
-    vnoremap ss :<C-U>wq<CR>
-    nnoremap qq :q!<CR>
-    vnoremap qq :<C-U>q!<CR>
-    " nnoremap q :wq<CR>  按一次q要等一会才退出， 不如连续按2次快
-    " inoremap qq <ESC>:wq<CR>  别这么干，容易在编辑时敲错
-
-    noremap j gj
-    noremap k gk
-
-    " map vs map! : map控制“字母不是用于输入”的几个mode，map！控制“字母 是用于输入的字符串的”mode
-    noremap H g^
-    " nnoremap H g0
-    noremap 0 g0
-    noremap <Home> g0
-    noremap L g$
-    noremap <End> g$
-
-    onoremap <silent> j gj
-    onoremap <silent> k gk
-    " nnoremap dd g^dg$i<BS><Esc>
-    " nnoremap yy g^yg$
-    " nnoremap cc g^cg$
-    nnoremap A g$a
-    nnoremap I g^i
-
-    nnoremap gm g$
-    " nnoremap M
-
-    nnoremap <c-\> <c-w>v
-    nnoremap <c-w>-  <c-w>s
-endif
-
-
 " T:tab, tab to space
 func T2S()
     " vscode 有个插件：takumii.tabspace  " 不过应该用不着了
@@ -423,91 +368,16 @@ endfunc
 " python文件中输入新行时#号注释不切回行首
 " autocmd BufNewFile,BufRead *.py inoremap # X<c-h>#
 
-if exists('g:vscode')
-    " 不行：
-    " nnoremap gk :<C-u>call VSCodeCall('cursorMove', { 'to': 'up', 'by': 'wrappedLine', 'value': v:count ? v:count : 1 })<CR>
-    " nnoremap gj :<C-u>call VSCodeCall('cursorMove', { 'to': 'down', 'by': 'wrappedLine', 'value': v:count ? v:count : 1 })<CR>
-    " todo
-    " insert mode下，neovim不管事，（但esc退回normal还是可以的），imap都用不了
-    " nnoremap gd vaw<F12>
-    " 不行
-    " nnoremap zz ZZ
-    " filetype on        " 检测文件类型  不会和vscode 打架吧
-else
-    " echo '没在用 vscode-neovim, 纯 nvim'
 
-    " <C-]>只能在本文件内跳转
-    nnoremap gd g<C-]>
-    " nnoremap gd :KiteGotoDefinition<CR>
+" 保存python等文件时删除多余空格
+func <SID>TrailingWhiteSpace()
+        let l = line(".")
+        let c = col(".")
+        %s/\s\+$//e
+        call cursor(l, c)
+endfunc
+autocmd FileType c,cpp,javascript,python,vim,sh,zsh autocmd BufWritePre <buffer> :call <SID>TrailingWhiteSpace()
 
-    set  number relativenumber
-    nnoremap <Leader>n :call HideNumber()<CR>
-    func HideNumber()
-        if(&relativenumber == &number)
-            " 叹号或者加inv：表示toggle
-            set invrelativenumber invnumber
-        elseif(&number)
-            set invnumber
-        else
-            set relativenumber!
-        endif
-
-        " :se[t] {option}?  Show value of {option}.
-        " set number?
-    endfunc
-
-    set wrap    " vscode里, 要在setting.json设置warp
-
-
-
-    " vscode上有插件自动处理，不用加这些:
-    set expandtab " 将Tab自动转化成空格[需要输入真正的Tab键时，使用 Ctrl+V + Tab]
-    set tabstop=4 " 设置Tab键等同的空格数
-    set shiftwidth=4 " 每一次缩进对应的空格数
-    set smarttab " insert tabs on the start of a line according to shiftwidth
-    set shiftround " 用shiftwidth的整数倍， when indenting with '<' and '>'
-    set softtabstop=4 " 按退格键时可以一次删掉 4 个空格
-    " 如果要仅对python有效：  autocmd Filetype python set 上面那堆
-
-    " `各种indent方法`
-        " 只是对c语言家族而言？
-        " 'autoindent'  uses the indent from the previous line.
-        " 'smartindent' is like 'autoindent' but also recognizes some C syntax to
-        "                 increase/reduce the indent where appropriate.
-        " 'cindent' Works more cleverly than the other two and is configurable to
-        "             different indenting styles.
-        " 'indentexpr'  The most flexible of all: Evaluates an expression to compute
-        "       the indent of a line.  When non-empty this method overrides
-        "       the other ones.  See |indent-expression|.
-    set cindent
-    " 考虑用谷歌的规范？
-    " https://github.com/google/styleguide/blob/gh-pages/google_python_style.vim
-    " set indentexpr=GetGooglePythonIndent(v:lnum)
-    "
-    " ==============================缩进==============================]]
-
-
-    " vscode里不行
-    " nnoremap zz :wq<C-R>
-    " inoremap zz <ESC>:wq<CR>
-    " cnoremap q1 q!
-    " Quickly close the current window
-    " nnoremap <leader>q :q<CR>
-    " Quickly save the current file
-    " nnoremap <leader>w :w<CR>
-
-    " 使用方向键切换buffer 。 vscode的map，别用command mode ?
-
-    " 保存python文件时删除多余空格
-    func <SID>StripTrailingWhitespaces()
-            let l = line(".")
-            let c = col(".")
-            %s/\s\+$//e
-            call cursor(l, c)
-    endfunc
-    autocmd FileType c,cpp,javascript,python,vimrc,sh,zsh autocmd BufWritePre <buffer> :call <SID>StripTrailingWhitespaces()
-
-endif
 
 " 让光标看着没动
 nnoremap yf ggyG<C-O>  " 让光标看着没动
@@ -551,26 +421,23 @@ call plug#begin(stdpath('data') . '/plugged')
 Plug 'junegunn/vim-plug' " 为了能用:help plug-options
 
 
-if !exists('g:vscode')
-    " Plug 'preservim/nerdtree', { 'on':  'NERDTreeToggle' }
-    Plug 'preservim/nerdtree'
-
+" Plug 'preservim/nerdtree', { 'on':  'NERDTreeToggle' }
+Plug 'preservim/nerdtree'
     autocmd StdinReadPre * let s:std_in=1
     autocmd VimEnter * if argc() == 0 && !exists('s:std_in') | NERDTree | endif
 
-    Plug 'voldikss/vim-translator'
+Plug 'voldikss/vim-translator'
     " todo mobaxterm 2080ti上不行
 
     " <Leader>t 翻译光标下的文本，在命令行回显
-    nnoremap <silent> <Leader>a <Plug>Translate
+    nnoremap  <Leader>a <Plug>Translate
     vnoremap <silent> <Leader>a <Plug>TranslateV
     " h被占了
-    " <Leader>h 翻译光标下的文本，在窗口中显示   h：here 
+    " <Leader>h 翻译光标下的文本，在窗口中显示   h：here
     nnoremap <silent> <Leader>a <Plug>TranslateW
     vnoremap <silent> <Leader>a <Plug>TranslateWV
     " Leader h被 set hlsearch！占用了
 
-endif
 
 Plug 'sheerun/vim-polyglot'
 Plug 'jonathanfilip/vim-lucius'   " colorscheme lucius
@@ -705,11 +572,12 @@ let g:Lf_StlSeparator = { 'left': "\ue0b0", 'right': "\ue0b2", 'font': "DejaVu S
 let g:Lf_PreviewResult = {'Function': 0, 'BufTag': 0 }
 
 " let g:Lf_ShortcutF = "<leader>o"
-let g:Lf_ShortcutF = "<leader>f"  " 要想快点弹出窗口，按下f后，马上输出字符
+" 和zsh下按ctrl f 作用一致
+let g:Lf_ShortcutF = "<c-f>"  " 要想快点弹出窗口，按下f后，马上输出字符
 " mru: most recently used file
-" C-u: 清楚cmdline的字符。很多插件都这么设
+" C-u: 删掉cmdline的字符。主要对visual mode有用？很多插件都这么设
     nnoremap <leader>fm :<C-U><C-R>=printf("Leaderf mru %s", "")<CR><CR>
-" Launch LeaderF to search a line in current buffer.  " 有点vscode下的感觉
+" search a line in current buffer.  " 有点vscode下的感觉
     nnoremap <leader>/ :<C-U><C-R>=printf("Leaderf line %s", "")<CR><CR>
 " <cword> is replaced with the word under the cursor (like |star|)
     " nnoremap <C-B> :<C-U><C-R>=printf("Leaderf! rg --current-buffer -e %s ", expand("<cword>"))<CR><CR>
@@ -717,7 +585,7 @@ let g:Lf_ShortcutF = "<leader>f"  " 要想快点弹出窗口，按下f后，马�
     "  LeaderfFunction! 叹号版本直接打开 normal 模式，并且定位到对应位置
     nnoremap <C-B> :<C-U><C-R>=printf("Leaderf rg --current-buffer -e %s ", expand("<cword>"))<CR><CR>
     " 不确定是否靠谱  " 代替在zsh中用rg
-    nnoremap <C-F> :<C-U><C-R>=printf("Leaderf rg -g '!*.zsh_history' -g '!*.lesshst' -g '!/data1/weifeng_liu/.large_trash' ")<CR><CR>
+    nnoremap <leader>f :<C-U><C-R>=printf("Leaderf rg -g '!*.zsh_history' -g '!*.lesshst' -g '!/data1/weifeng_liu/.large_trash' ")<CR><CR>
     " 这个不起作用，不能ctrl+shift？
     " nnoremap <C-S-F> :<C-U><C-R>=printf("Leaderf! rg -e %s ", expand("<cword>"))<CR><CR>
     " nnoremap <C-S-F> :<C-U><C-R>=printf("Leaderf! rg -e ")<CR><CR>
@@ -824,24 +692,6 @@ vnoremap <C-_> :call nerdcommenter#Comment('n', 'toggle')<CR>
 
 
 
-if exists('g:vscode')
-    " vscode里，<C-_>注释，用的是vscode的"editor.action.comment"之类的,不是vim的命令,这样不行：
-    " nnoremap ce A<space><space><Esc>o/<Esc><Esc><Esc><Esc><Esc><Esc><C-_>kJA<BS>
-
-    " 有时会弄脏代码，可能是vscode-nvim弹出窗口太慢了？它不能接管inputmode？  " 提issue吧
-    nnoremap ce A<space><space><Esc>o/<Esc><Esc>:::::call nerdcommenter#Comment("n", "Comment")<space><CR>kJA<BS>
-
-
-    " vscode-neovim的 VSCodeCommentary is just a simple function which calls editor.action.commentLine.
-    " xmap <C-_>  <Plug>VSCodeCommentary
-    " nmap <C-_>  <Plug>VSCodeCommentary
-    " omap <C-_>  <Plug>VSCodeCommentary
-    " nmap <C-_>  <Plug>VSCodeCommentaryLine
-else
-    " let g:NERDCreateDefaultMappings = 0  " 之前设为1，导致vscode用不了nerdcommenter?
-    nnoremap ce A<space><space><Esc>o/<Esc><Esc>:call nerdcommenter#Comment("n", "Comment")<CR>kJA<BS>
-    " 有缩进时，有时会把开头的注释符号删掉，别完美主义吧
-endif
 
 
 nnoremap <M-/> yy:call nerdcommenter#Comment('n', 'toggle')<CR>p
@@ -1045,7 +895,7 @@ func Wfprint_n()
         execute "normal hhhhhp"
     elseif &filetype == 'cpp'
         " execute 'normal yiwocout<<""<<' | execute 'normal hhhpf<lpa<<endl;'
-        execute 'normal yiwocout<<""<<' 
+        execute 'normal yiwocout<<""<<'
         execute 'normal hhhpf<lpa<<endl;'
     elseif &filetype == 'zsh'
         execute 'normal yiwoecho ${}'
@@ -1303,17 +1153,10 @@ inoremap <C-a> <ESC>I
 nnoremap <C-e> $
 inoremap <C-e> <ESC>A
 
-if !exists('g:code')
-    cnoremap <C-a> <Home>
-    cnoremap <C-e> <End>
-endif
 
 
 " http://stackoverflow.com/questions/2005214/switching-to-a-particular-tab-in-vim
 
-map <leader>h :tabprev<cr>
-map <leader>l :tabnext<cr>
-set guitablabel=\[%N\]\ %t\ %M
 
 " normal模式下切换到确切的tab
 noremap <leader>1 1gt
@@ -1387,7 +1230,7 @@ let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
 " vmap creates one for both Visual mode and Select mode. select mode很少用
 " <NOP>     no-opperation? do nothing (useful in mappings)
 
-" DEBUG: easymotion发疯来这里 
+" DEBUG: easymotion发疯来这里
 nnoremap s :echo '待用'
 
 " 之前不知道为什么不生效： 现在 没加这几行,也能用,应该是默认的
@@ -1408,51 +1251,7 @@ set updatetime=300
 
 
 
-if !exists('g:vscode') " or hostname() == 'redmi14-leo'  不要这样，起码保证ubuntu下的workflow一致
-    " >_>_>coc补全==================================================================begin
-
-    " 在前面的基础上，加上c
-    set shortmess+=c  " Don't pass messages to |ins-completion-menu|.
-
-    " Always show the signcolumn, otherwise it would shift the text each time
-    " diagnostics appear/become resolved.
-    if has("nvim-0.5.0") || has("patch-8.1.1564")
-    " Recently vim can merge signcolumn and number column into one
-    set signcolumn=number
-    else
-    set signcolumn=yes
-    endif
-
-
-    " pumvisible(): Returns non-zero when the popup menu is visible
-    inoremap <silent><expr> <TAB>
-        \ pumvisible() ? "\<C-n>" :
-        \ <SID>check_back_space() ? "\<TAB>" :
-        \ coc#refresh()
-
-    " 这是干啥的
-    func! s:check_back_space() abort
-    let col = col('.') - 1
-    return !col || getline('.')[col - 1]  =~# '\s'
-    endfunc
-
-    " Make <CR> auto-select the first completion item and notify coc.nvim to
-    " format on enter
-    inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
-                                \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-
-    " Highlight the symbol and its references when holding the cursor.
-    autocmd CursorHold * silent call CocActionAsync('highlight')
-
-    " Add (Neo)Vim's native statusline support.
-    " NOTE: Please see `:h coc-status` for integrations with external plugins that
-    " provide custom statusline: lightline.vim, vim-airline.
-    set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-
-    " coc补全=====================================================================<_<_<
-endif
-
-" 用法:  put =Vim_out('你的命令') 
+" 用法:  put =Vim_out('你的命令')
 funct Vim_out(my_cmd)
 " https://unix.stackexchange.com/a/8296/457327
     redir =>my_output
@@ -1461,6 +1260,12 @@ funct Vim_out(my_cmd)
     redir END
     return my_output
 endfunc
+" 用法:  put =Vim_out('你的命令')
+
+" <C-:> 不行，cat后`ctrl :`   显示的是<C-[>，和真的<C-[> 已经esc同体？
+" unmap <C-[>
+nnoremap  <c-'>     :tabedit ~/.t/wf_out.vim<CR>:put = Vim_out('')<left><left>
+nnoremap  <Leader>: :tabedit ~/.t/wf_out.vim<CR>:put = Vim_out('')<left><left>
 
 nnoremap ko O
 
@@ -1527,15 +1332,6 @@ func Conceal_strang_chr_3()
     " set concealcursor=vcni
 endfunc
 
-" block模式
-" <C-q>用不了，可能是kite占用了  [好像又能用了]
-" 记忆：c for block c发音:ke
-nnoremap <C-C> <C-v>
-nnoremap <C-V> <C-V>
-
-" 变成^  作用是 显示ASCII码 （以^H等方式显示一些控制字符）
-" vscod里不生效：
-inoremap <C-C> <C-V>
 
 if !has('win32')
     source ~/dotF/cfg/nvim/beautify_wf.vim
@@ -1556,7 +1352,7 @@ endif
 "    %r  readonly, 显示 [RO]
 set statusline=
 set statusline=%7*=%r
-set statusline=%=%t                            " tittle  
+set statusline=%=%t                            " tittle
 set statusline+=%=\ buffer号:%n\            "buffer number
 set statusline+=%=%m                         "modified flag
 " set statusline+=%=文件格式:%{&ff}            "是否unix
@@ -1596,5 +1392,52 @@ set laststatus=2  "  always show statusline
 " put the  block above in your vimrc file and
 " the following lines in your current colorscheme file.
 " hi User1 guifg=#ffdad8  guibg=#880c0e
+"
+
+map <leader>h :tabprev<cr>
+map <leader>l :tabnext<cr>
+" 或者叫tabline? tab statusline tab栏 tab status
+" 改了不生效：
+set guitablabel=\[%N\]\ %t\ %M
+" set guitablabel=%t
+
+
+" function GuiTabLabel()
+"     let label = ''
+"     let bufnrlist = tabpagebuflist(v:lnum)
+"
+"     " Add '+' if one of the buffers in the tab page is modified
+"     for bufnr in bufnrlist
+"     if getbufvar(bufnr, "&modified")
+"         let label = '+'
+"         break
+"     endif
+"     endfor
+"
+"     " Append the number of windows in the tab page if more than one
+"     let wincount = tabpagewinnr(v:lnum, '$')
+"     if wincount > 1
+"     let label .= wincount
+"     endif
+"     if label != ''
+"     let label .= ' '
+"     endif
+"
+"     " Append the buffer name
+"     return label . bufname(bufnrlist[tabpagewinnr(v:lnum) - 1])
+" endfunction
+"
+" set guitablabel=%{GuiTabLabel()}
+"
+
+if exists('g:vscode')
+    " cnoremap s/ s/\v
+    " vscode里，用了camp时，必须在光标后有字符才能正常map
+    source $in_vscode
+else
+    source $no_vscode
+endif
+
 
 " =============================================vim-plug===============================end
+"
