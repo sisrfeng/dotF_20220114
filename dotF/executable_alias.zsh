@@ -816,14 +816,11 @@ gg(){
 
 # 我最新的配置 真是yyds
 yy(){
-    # echo "\n--------------------------------4. add commit push三连-----------------------------------------------"
-    cd ~/dotF
-    git stash clear  # 避免pull后有冲突，合并完后，再敲gg，死循环地有冲突
     echo "\n--------------------------------add commit push三连-----------------------------------------------"
     git add --verbose  --all .
     if [[ "$1" != "" ]]  # if [[ "$1" == "" ]] 容易出bug？一般都不这么写
     then
-        # 不加--all时，如过github有些文件，而本地删掉了，则github上不想要的文件 还在
+        # 不加--all时，如果github有些文件，而本地删掉了，则github上不想要的文件 还在
         git commit --all --message "$1"
     else
         git commit --all --message "我是commit名__`date  +"%m月%d日%H:%M"`"
@@ -831,8 +828,26 @@ yy(){
     git push --quiet  #  只在出错时有输出
     # git push 2>&1 >~/.t/git_push的stdout  # 不行
     cd -
-    zsh
+    exit
 }
+# yy(){
+#     # echo "\n--------------------------------4. add commit push三连-----------------------------------------------"
+#     cd ~/dotF
+#     git stash clear  # 避免pull后有冲突，合并完后，再敲gg，死循环地有冲突
+#     echo "\n--------------------------------add commit push三连-----------------------------------------------"
+#     git add --verbose  --all .
+#     if [[ "$1" != "" ]]  # if [[ "$1" == "" ]] 容易出bug？一般都不这么写
+#     then
+#         # 不加--all时，如过github有些文件，而本地删掉了，则github上不想要的文件 还在
+#         git commit --all --message "$1"
+#     else
+#         git commit --all --message "我是commit名__`date  +"%m月%d日%H:%M"`"
+#     fi
+#     git push --quiet  #  只在出错时有输出
+#     # git push 2>&1 >~/.t/git_push的stdout  # 不行
+#     cd -
+#     zsh
+# }
 
 
 
