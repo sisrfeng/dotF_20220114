@@ -93,7 +93,7 @@ if [ -d "$HOME/bin" ]; then
 fi
 
 export PAHT="$PATH:/usr/lib/w3m/w3mimagedisplay"
-export PAHT="$PATH:$HOME/dotF/bin_wf"
+export PAHT="$PATH:$HOME/dotF/bin_wf:$HOME/dotF/exa/bin"
 
 # https://zsh.sourceforge.io/Intro/intro_6.html
 DIRSTACKSIZE=15 # Setup dir stack
