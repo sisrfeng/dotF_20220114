@@ -59,4 +59,4 @@ nnoremap ce A<space><space><Esc>o/<Esc><Esc>:::::call nerdcommenter#Comment("n",
     " omap <C-_>  <Plug>VSCodeCommentary
     " nmap <C-_>  <Plug>VSCodeCommentaryLine
 
-echo '到了in_vscode.vim的最后'
+echom '到了in_vscode.vim的最后'
