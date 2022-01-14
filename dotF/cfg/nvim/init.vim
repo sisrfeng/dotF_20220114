@@ -5,7 +5,24 @@
 " let $no_vscode = expand('%:h') . "/no_vscode.vim"
 " let $no_vscode = fnamemodify('%',':h') . "/no_vscode.vim"
 let $no_vscode = fnamemodify($MYVIMRC,':h') . "/no_vscode.vim"
-let $in_vscode = fnamemodify($MYVIMRC,':h') . "/in_vscode.vim"
+
+if exists('g:vscode')
+    " 用vscode时，本文件里也有依赖于$MYVIMRC的变量。别扔掉$MYVIMRC
+    let $MYVIMRC =  "/root/dotF/cfg/nvim/init.vim"
+    " 放进if？ gf无法跳到has_vscode.vim
+    " let $has_vscode = fnamemodify($MYVIMRC,':h') . "/has_vscode.vim"
+endif
+let $has_vscode = fnamemodify($MYVIMRC,':h') . "/has_vscode.vim"
+
+" 无法expand/扩展/识别 文件名
+" let $has_vscode = fnamemodify($MYVIMRC,':h') . "/has_vscode.vim"
+" let $has_vscode = expand('%:h') . "/has_vscode.vim"
+" let $has_vscode = fnamemodify('%',':h') . "/has_vscode.vim"
+
+
+" echom 'has_vscode找到了吗'
+" echom $has_vscode
+
 
 
 nnoremap <c-d> 15<c-d>
@@ -35,7 +52,7 @@ autocmd!
                                                                                 " 点号拼接字符串
 autocmd Reload BufWritePost $MYVIMRC    ++nested   source $MYVIMRC | echom "更新了"."init.vim "| redraw
 autocmd Reload BufWritePost $no_vscode  ++nested   source $MYVIMRC | echom '根据环境变量，改了no_vscode.vim, 加载了init.vim' | redraw
-autocmd Reload BufWritePost $in_vscode  ++nested   source $MYVIMRC | echom '(改了in_vscode.vim, 更新init.vim)'  | redraw
+autocmd Reload BufWritePost $has_vscode  ++nested   source $MYVIMRC | echom '(改了has_vscode.vim, 更新init.vim)'  | redraw
 
 " 4. Go back to the default group, named "end"
 augroup end
@@ -1433,7 +1450,9 @@ set guitablabel=\[%N\]\ %t\ %M
 if exists('g:vscode')
     " cnoremap s/ s/\v
     " vscode里，用了camp时，必须在光标后有字符才能正常map
-    source $in_vscode
+    echom '准备进入has_vscode.vim: 路径'
+    echom $has_vscode
+    source $has_vscode
 else
     source $no_vscode
 endif
